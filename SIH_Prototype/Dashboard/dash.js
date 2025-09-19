@@ -326,6 +326,11 @@ function computeRecommendation(){
     }
   }
   sim.rec = rec;
+  //  if (rec) {
+  //   localStorage.setItem('aiRecommendation', JSON.stringify(rec));
+  // } else {
+  //   localStorage.removeItem('aiRecommendation');
+  // }
   if (rec){
     aiRecEl.textContent = rec.text;
     aiNoteEl.textContent = rec.note;
@@ -337,7 +342,9 @@ function computeRecommendation(){
     applyRecBtn.disabled = true;
     dismissRecBtn.disabled = true;
   }
+  
 }
+
 
 /* ---------- Movement & rules ---------- */
 function advanceWithinBlocks(t, dx){
