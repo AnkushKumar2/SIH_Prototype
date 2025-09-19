@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAIL MITRA</title>
+    <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <div class="wrapper">
+        <form id="loginForm" action="">
+            <h1>Rail Mitra Login</h1>
+            <div class="input-box">
+                <input type="text" placeholder="EmplyeeID" required >
+                <i class='bxr  bx-user'  ></i> 
+            </div>
+            <div class="input-box">
+                <input type="password" placeholder="Password" required>
+                <i class='bxr  bx-lock'  ></i> 
+            </div>
+            <div class="remember-me">
+                <label for="">
+                    <!-- <input type="checkbox">Remember me -->
+                </label>
+            </div>
+            <button  type="submit" class="btn">Login</button>
+        </form>
+    </div>
+     <script>
+      document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        window.location.href = "dash.html";
+      });
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>RAIL MITRA-AI Train Traffic Control</title>
+<link rel="stylesheet" href="dash.css" />
+</head>
+<body>
+<header>
+ <div class="brand"><img class="logo" src="logo.jpg" alt="Rail Mitra Logo"/> RAIL MITRA <br>
+<span class="brand-subtitle">
+    AI Train Traffic Control
+
+</span></div>
+ <nav>
+    <a class="active" href="#">Dashboard</a>
+    <a href="#">Platform Allocations</a>
+    <a href="contact.html">Contact</a>
+    <a href="login.html">
+        <button class="btn nav-login-btn">Login</button>
+
+    </a>
+    
+  </nav>
+</header>
+<div class="welcome-container">
+  <h2>Welcome to Rail Mitra</h2>
+  <p>
+    Intelligent Decision-Support System for Indian Railways Traffic Controllers.<br>
+    Real-time monitoring, AI-powered recommendations, and optimized train operations.<br>
+    
+  </p>
+</div>
+
+
+<div class="container">
+  <section class="card">
+    <h3><img class="alert-logo" src="alert-shield.png" alt="Alert Shield"/> Alerts & controls</h3>
+    <div class="content" id="alerts"></div>
+    <div class="content controls">
+      <div class="row">
+        <label>Simulation</label>
+        <div>
+          <button class="btn" id="togglePlay">Pause</button>
+          <button class="btn ghost" id="stepOnce">Step</button>
+        </div>
+      </div>
+      <div class="row">
+        <label>Speed x<span id="speedVal">1.0</span></label>
+        <input type="range" id="speed" min="0.2" max="2.5" step="0.1" value="1.0" />
+      </div>
+      <div class="row">
+        <label>Inject disruption</label>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn danger" id="failUp2">Fail Up Blk2 (A–C)</button>
+          <button class="btn danger" id="failDown2">Fail Down Blk2 (A–C)</button>
+        </div>
+      </div>
+      <div class="row">
+        <label>Clear disruptions</label>
+        <button class="btn" id="clearAll">Clear all failures</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h3><img class="track-logo" src="broadcast.png" alt="Track Shield"/> Live track visualization — Station A ↔ Station C ↔ Station B</h3>
+    <div class="viz">
+      <svg id="railSvg" width="100%" height="100%" viewBox="0 0 1200 420" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id="trackFade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#294055" />
+            <stop offset="100%" stop-color="#1b232c" />
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3.0" result="coloredBlur"/>
+            <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <!-- Stations -->
+        <rect x="40" y="80" width="120" height="240" rx="8" fill="#171b22" stroke="#4cc2ff" stroke-width="2"/>
+        <text x="100" y="200" class="station-label" text-anchor="middle">Station A</text>
+        <text x="100" y="220" class="station-label" fill="#9db7ff" text-anchor="middle">Platforms: 1,2</text>
+        
+        <rect x="560" y="80" width="120" height="240" rx="8" fill="#171b22" stroke="#4cc2ff" stroke-width="2"/>
+        <text x="620" y="200" class="station-label" text-anchor="middle">Station C</text>
+        <text x="620" y="220" class="station-label" fill="#9db7ff" text-anchor="middle">Platforms: 5,6</text>
+        
+        <rect x="1040" y="80" width="120" height="240" rx="8" fill="#171b22" stroke="#4cc2ff" stroke-width="2"/>
+        <text x="1100" y="200" class="station-label" text-anchor="middle">Station B</text>
+        <text x="1100" y="220" class="station-label" fill="#9db7ff" text-anchor="middle">Platforms: 3,4</text>
+        <!-- Main up/down lines
+        <line x1="160" y1="100" x2="1040" y2="100" stroke="url(#trackFade)" stroke-width="6"/>
+        <line x1="160" y1="320" x2="1040" y2="320" stroke="url(#trackFade)" stroke-width="6"/>
+        Additional tracks (middle lines) -->
+        <!-- <line x1="160" y1="180" x2="1040" y2="180" stroke="#b7dfff" stroke-width="4" stroke-dasharray="8 6"/>
+        <line x1="160" y1="240" x2="1040" y2="240" stroke="#b7dfff" stroke-width="4" stroke-dasharray="8 6"/>
+        Crossovers (visual)
+        <line x1="520" y1="100" x2="640" y2="320" stroke="#ffb357" stroke-width="3" stroke-dasharray="6 4"/>
+        <line x1="520" y1="320" x2="640" y2="100" stroke="#ffb357" stroke-width="3" stroke-dasharray="6 4"/>
+        <line x1="520" y1="180" x2="640" y2="240" stroke="#ffb357" stroke-width="3" stroke-dasharray="6 4"/>
+        <line x1="520" y1="240" x2="640" y2="180" stroke="#ffb357" stroke-width="3" stroke-dasharray="6 4"/>
+        
+<!-- Main up/down lines -->
+<line x1="160" y1="120" x2="1040" y2="120" class="track-up"/>
+<line x1="160" y1="300" x2="1040" y2="300" class="track-down"/>
+<!-- Additional tracks (middle lines) -->
+<line x1="160" y1="180" x2="1040" y2="180" class="track-mid"/>
+<line x1="160" y1="240" x2="1040" y2="240" class="track-mid"/>
+<!-- Fourth track -->
+<line x1="160" y1="260" x2="1040" y2="260" class="track-mid"/>
+<!-- Crossovers (visual) -->
+<line x1="520" y1="120" x2="640" y2="300" class="track-crossover"/>
+<line x1="520" y1="300" x2="640" y2="120" class="track-crossover"/>
+<line x1="520" y1="180" x2="640" y2="240" class="track-crossover"/>
+<line x1="520" y1="240" x2="640" y2="180" class="track-crossover"/>
+<line x1="520" y1="240" x2="640" y2="260" class="track-crossover"/>
+<line x1="520" y1="260" x2="640" y2="240" class="track-crossover"/>
+
+        <!-- Trains layer -->
+        <g id="trains"></g>
+      </svg>
+    </div>
+    <div class="legend">
+      <span class="key"><span class="swatch up"></span> Up line (A → B)</span>
+      <span class="key"><span class="swatch down"></span> Down line (B → A)</span>
+      <span class="key"><span class="swatch blocked"></span> Blocked</span>
+      <span class="key"><span style="display:inline-block;width:14px;height:4px;background:#b7dfff;border-radius:2px;"></span> Middle tracks</span>
+      <span class="key"><span style="display:inline-block;width:14px;height:4px;background:#ffb357;border-radius:2px;"></span> Crossover</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h3><img class="train-logo" src="train.png" alt="Train Status"/> Trains, status & AI decisions</h3>
+    <div class="content" style="flex:1;overflow:auto;">
+      <table id="trainTable" class="train-status-table">
+        <thead>
+          <tr>
+            <th class="sortable" data-sort="id">Train ID</th>
+            <th class="sortable" data-sort="status">Status</th>
+            <th class="sortable" data-sort="track">Platform</th>
+            <th class="sortable" data-sort="dir">Direction</th>
+            <th class="sortable" data-sort="eta">ETA</th>
+            <th class="sortable" data-sort="delay">Delay</th>
+            <th class="sortable" data-sort="priority">Priority</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="ai">
+      <div class="title"><img class="brain-logo" src="brain.png" alt="Alert Shield"/>AI recommendation</div>
+      <div class="rec" id="aiRec">All clear. No conflicts predicted.</div>
+      <div class="note" id="aiNote">When disruptions occur, AI proposes corridor-based wrong-line reroutes and holding strategies by priority.</div>
+      <div class="policy">
+        <span class="sub">Override policy:</span>
+        <button class="btn" id="polHoldAll">Conservative (hold all near failure)</button>
+        <button class="btn" id="polKeepLines">No wrong-line (keep normal lines)</button>
+        <button class="btn" id="polAggressive">Aggressive (favor highest priority)</button>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="applyRec" disabled>Accept AI plan</button>
+        <button class="btn ghost dismiss" id="dismissRec" disabled>Dismiss</button>
+        <button class="btn replan"   id="replan">Re-plan full section</button>
+      </div>
+    </div>
+  </section>
+</div>
+<script src="dash.js"></script>
+</body>
+</html>
