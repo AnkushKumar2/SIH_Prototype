@@ -230,6 +230,7 @@ function tryPlanCorridor(train, forcedPolicy=null){
   return true;
 }
 
+
 /* ---------- AI recommendation ---------- */
 function computeRecommendation(){
   let rec = null;

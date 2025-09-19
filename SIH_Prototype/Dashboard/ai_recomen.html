@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>RAIL MITRA - AI Recommendations</title>
+<link rel="stylesheet" href="ai_recomen.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+</head>
+<body>
+
+<header>
+ <div class="brand"><img class="logo" src="logo.jpg" alt="Rail Mitra Logo"/> RAIL MITRA <br>
+<span class="brand-subtitle">
+    AI Train Traffic Control
+</span></div>
+ <nav>
+    <a href="dash.html">Dashboard</a>
+    <a href="#">Platform Allocations</a>
+   
+    <a class="active" href="ai_recomen.html">AI Recommendations</a>
+     <a href="contact.html">Contact</a>
+    <a href="login.html">
+        <button class="btn nav-login-btn">Login</button>
+    </a>
+  </nav>
+</header>
+
+<div class="welcome-container">
+  <h2>AI Recommendations Center</h2>
+  <p>
+    Intelligent decision support for traffic optimization and conflict resolution.
+  </p>
+</div>
+
+<div class="container ai-center-container">
+  <section class="card ai-center-card">
+    <h3><i class="fas fa-brain" style="margin-right:8px; color:#b7dfff;"></i> AI Recommendations Center</h3>
+    <div class="content" id="ai-recommendations-content">
+      <div class="ai-header">
+        <div>
+          <h1 class="ai-title"><i class="fas fa-brain" style="margin-right: 8px;"></i> AI Recommendations Center</h1>
+          <p class="ai-subtitle">
+            Intelligent decision support for traffic optimization and conflict resolution
+          </p>
+        </div>
+        <div class="ai-header-actions">
+          <div class="ai-last-update">
+            <i class="far fa-clock"></i>
+            <span>Last updated: <span id="lastUpdate">11:55:42</span></span>
+          </div>
+          <button class="btn ai-btn-refresh">
+            <i class="fas fa-sync-alt"></i> Auto-Refresh
+          </button>
+        </div>
+      </div>
+
+      <div class="ai-stats-overview">
+        <div class="stat-card">
+          <h4>Active Recs</h4>
+          <p>4</p>
+        </div>
+        <div class="stat-card">
+          <h4>Critical</h4>
+          <p>1</p>
+        </div>
+        <div class="stat-card">
+          <h4>Avg Confidence</h4>
+          <p>84%</p>
+        </div>
+        <div class="stat-card">
+          <h4>Success Rate</h4>
+          <p>89%</p>
+        </div>
+      </div>
+
+      <div class="tab-nav">
+        <button class="tab-btn active" data-tab="recommendations">
+          <i class="fas fa-list-alt"></i> Active Recommendations
+        </button>
+        <button class="tab-btn" data-tab="history">
+          <i class="fas fa-history"></i> History & Analytics
+        </button>
+        <button class="tab-btn" data-tab="policy">
+          <i class="fas fa-cog"></i> Policy Configuration
+        </button>
+      </div>
+
+      <div class="tab-content-container">
+        <div id="tab-recommendations" class="tab-pane active">
+          <div class="recommendations-layout">
+            <div class="filter-panel">
+              <h4>Filters</h4>
+              <div class="filter-group">
+                <label>Type</label>
+                <select class="filter-select">
+                  <option>All</option>
+                  <option>Platform</option>
+                  <option>Routing</option>
+                  <option>Speed</option>
+                  <option>Holding</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>Priority</label>
+                <select class="filter-select">
+                  <option>All</option>
+                  <option>Critical</option>
+                  <option>High</option>
+                  <option>Medium</option>
+                  <option>Low</option>
+                </select>
+              </div>
+              <button class="btn btn-clear-filters">Clear Filters</button>
+            </div>
+            
+            <div class="recommendations-list" id="recommendations-list">
+              </div>
+          </div>
+        </div>
+        
+        <div id="tab-history" class="tab-pane">
+          <div class="history-content" id="history-content">
+            </div>
+        </div>
+        
+        <div id="tab-policy" class="tab-pane">
+          <div class="policy-content" id="policy-content">
+            </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="ai_recomen.js"></script>
+</body>
+</html>
