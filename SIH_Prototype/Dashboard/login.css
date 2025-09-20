@@ -14,9 +14,18 @@ body{
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background:url(control-room-of-railway-E511E3.jpg) no-repeat;
+    background:url('https://images.unsplash.com/photo-1596753599476-7a7c2f7677fc?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') no-repeat;
     background-size: cover;
     background-position: center;
+}
+.overlay-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+    /* A semi-transparent black background to act as the blur layer */
+    background: rgba(0, 0, 0, 0.5);
 }
 .wrapper{
     width:420px;

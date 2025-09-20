@@ -26,10 +26,12 @@ function addAlert(severity, message){ sim.alerts.unshift({severity,message,ts:ne
 /* ---------- Trains ---------- */
 // Two trains on mid1 and mid2 will conflict at the mid crossover (x=520-640)
 const trains = [
-  { id:"12001", name:"12001 Shatabdi", dir:"up",   track:"up",   priority:"High",   x:180, vKmh:130, dwell:6, state:"Running", delayMin:0, color:"#4cc2ff" },
-  { id:"19345", name:"19345 Express",  dir:"down", track:"down", priority:"High",   x:980, vKmh:130, dwell:6, state:"Running", delayMin:0, color:"#69d0ff" },
-  { id:"22177", name:"22177 Superfast",dir:"up",   track:"mid1", priority:"Medium", x:510, vKmh:80, dwell:5, state:"Running", delayMin:0, color:"#77f39b" },
-  { id:"9F201", name:"9F201 Freight",  dir:"down", track:"mid2", priority:"Medium", x:630, vKmh:80, dwell:5, state:"Running", delayMin:0, color:"#59d789" }
+  { id:"Goa Express", name:"Goa Express", dir:"up",   track:"down",   priority:"Medium",   x:180, vKmh:130, dwell:6, state:"Running", delayMin:0, color:"#4cc2ff" },
+  { id:"Grand Trunk Express", name:"Grand Trunk Express",  dir:"down", track:"mid2", priority:"Medium",   x:640, vKmh:90, dwell:6, state:"Running", delayMin:0, color:"#69d0ff" },
+  { id:"Hazrat Nizamuddin ‒ KSR Bengaluru Rajdhani Express", name:"Hazrat Nizamuddin ‒ KSR Bengaluru Rajdhani Express",dir:"up",   track:"down", priority:"High", x:510, vKmh:80, dwell:5, state:"Running", delayMin:0, color:"#77f39b" },
+  { id:"Kerala Express", name:"Kerala Express",  dir:"up", track:"mid1", priority:"High", x:520, vKmh:80, dwell:5, state:"Running", delayMin:0, color:"#59d789" }
+  // { id:"Kerala Express", name:"Kerala Express",  dir:"down", track:"up", priority:"Medium", x:630, vKmh:80, dwell:5, state:"Running", delayMin:0, color:"#59d789" }
+  // { id:"Kerala Express", name:"Kerala Express",  dir:"down", track:"up", priority:"Medium", x:630, vKmh:80, dwell:5, state:"Running", delayMin:0, color:"#59d789" }
 ];
 
 /* ---------- DOM ---------- */
@@ -233,21 +235,46 @@ function tryPlanCorridor(train, forcedPolicy=null){
 
 /* ---------- AI recommendation ---------- */
 function computeRecommendation(){
+   if (sim._recSuppressedUntil && performance.now() < sim._recSuppressedUntil) {
+    sim.rec = null;
+    aiRecEl.textContent = 'All clear. No conflicts predicted.';
+    aiNoteEl.textContent = 'When disruptions occur, AI proposes corridor-based wrong-line reroutes and holding strategies by priority.';
+    applyRecBtn.disabled = true;
+    dismissRecBtn.disabled = true;
+    return;
+  }
+  // clear the temporary suppression flag if expired
+  sim._recSuppressedUntil = sim._recSuppressedUntil && performance.now() < sim._recSuppressedUntil ? sim._recSuppressedUntil : null;
   let rec = null;
   // Detect conflict at mid crossover (x=520-640) between mid1 and mid2
   const t1 = trains.find(t => t.track === 'mid1' && t.x >= 520 && t.x <= 640);
   const t2 = trains.find(t => t.track === 'mid2' && t.x >= 520 && t.x <= 640);
   if (t1 && t2) {
     rec = {
-      text: `Potential conflict detected at mid crossover between ${t1.id} and ${t2.id}. Recommend holding ${t2.id} until ${t1.id} clears the corridor.`,
+      text: `Potential conflict detected at mid crossover between ${t1.id} and ${t2.id}. Recommend holding ${t1.id} until ${t2.id} clears the corridor.`,
       note: `AI detected both trains approaching the same crossover. Holding one prevents collision.`,
-      plans: [{type:'hold', holds:[t2.id], where:'at mid crossover'}],
+      plans: [{type:'hold', holds:[t1.id], where:'at mid crossover'}],
       apply: ()=>{
         const t = trains.find(x=>x.id===t2.id);
         if (t) { t.state='Held'; t.holdUntil=performance.now()+90000/sim.speed; }
-        addAlert('yellow', `AI: Holding ${t2.id} to avoid conflict at crossover.`);
+        addAlert('yellow', `AI: Holding ${t1.id} to avoid conflict at crossover.`);
+        // aiRecEl.textContent = 'All clear. No conflicts predicted.';
+      //         applyRecBtn.addEventListener('click',()=>
+      // aiRecEl.textContent=" ",
+      // aiNoteEl.textContent=" ",)
+
       }
+      
+      // apply:()=>{
+      //   aiRecEl.textContent=" ",
+      // aiNoteEl.textContent=" ";
+
+      // }
+      // applyRecBtn.addEventListener('click',()=>
+      // aiRecEl.textContent=" ";
+      // aiNoteEl.textContent=" ";)
     };
+    
   } else {
     // Fallback to original logic for failures
     const failed = [];
@@ -432,6 +459,21 @@ function step(dtMs){
     handleTerminus(t);
   }
 }
+function applyAIPlan() {
+  if (sim.rec?.apply) {
+    sim.rec.apply(); // run all recommended holds/reroutes
+  }
+  // Reset recommendation
+  sim.rec = null;
+  aiRecEl.textContent = 'All clear. No conflicts predicted.';
+  aiNoteEl.textContent = 'When disruptions occur, AI proposes corridor-based wrong-line reroutes and holding strategies by priority.';
+  applyRecBtn.disabled = true;
+  dismissRecBtn.disabled = true;
+  renderTrainTable();
+
+  sim._recSuppressedUntil = performance.now() + 100000;
+}
+
 
 /* ---------- UI wiring ---------- */
 document.getElementById('speed').addEventListener('input',(e)=>{ sim.speed=parseFloat(e.target.value); document.getElementById('speedVal').textContent=sim.speed.toFixed(1); });
@@ -440,7 +482,9 @@ document.getElementById('stepOnce').addEventListener('click',()=>{ step(200); up
 document.getElementById('failUp2').addEventListener('click',()=>{ failBlock('up',1); computeRecommendation(); renderTrainTable(); });
 document.getElementById('failDown2').addEventListener('click',()=>{ failBlock('down',1); computeRecommendation(); renderTrainTable(); });
 document.getElementById('clearAll').addEventListener('click',()=>{ clearAllFailures(); computeRecommendation(); renderTrainTable(); });
-applyRecBtn.addEventListener('click',()=>{ if(sim.rec?.apply) sim.rec.apply(); computeRecommendation(); renderTrainTable(); });
+// applyRecBtn.addEventListener('click',()=>{ if(sim.rec?.apply) sim.rec.apply(); computeRecommendation(); renderTrainTable(); });
+applyRecBtn.addEventListener('click', applyAIPlan);
+
 dismissRecBtn.addEventListener('click',()=>{ sim.rec=null; computeRecommendation(); });
 document.getElementById('replan').addEventListener('click',()=>{
   let changed = false;
